@@ -1,0 +1,3 @@
+Write an article on building a chatbot with Streamlit and LlamaIndex. Focus on showcasing the ease of building using Streamlit's chat elements (st.chat_input and st.chat_message).
+
+Provide detailed code breakdown, highlighting how to load custom data using SimpleDirectoryReader and SimpleVectorStore, index it with SimpleVectorStore, and build an interactive chat UI within Streamlit.

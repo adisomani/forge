@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Powerful Chatbots with Streamlit's Chat Elements and LlamaIndex</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.75;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        header {
+            background-color: #6c9eed;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        h2 {
+            color: #4a76c9;
+            border-bottom: 2px solid #4a76c9;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        h3 {
+            color: #5a86d9;
+            margin-top: 30px;
+        }
+        .author-info {
+            font-style: italic;
+            margin-top: 10px;
+        }
+        .tldr {
+            background-color: #e6f3ff;
+            border-left: 5px solid #6c9eed;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        code {
+            background-color: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        pre {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        .highlight {
+            background-color: #e6f0ff;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        ul {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #6c9eed;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .cta-button:hover {
+            background-color: #5a86d9;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Building Powerful Chatbots with Streamlit's Chat Elements and LlamaIndex</h1>
+        <p class="author-info">By Aditya Somani | Posted in Tutorials, Sept 01 2024</p>
+    </header>
+
+    <div class="tldr">
+        <h3>TL;DR</h3>
+        <p>Learn how to use Streamlit's <code>st.chat_input</code> and <code>st.chat_message</code> to quickly build interactive chatbots. This tutorial covers the step-by-step process of creating a custom data-augmented chatbot using Streamlit and LlamaIndex.</p>
+    </div>
+
+    <p>Streamlit revolutionizes the way developers build web applications for machine learning and data science. With its new chat elements, Streamlit makes building interactive chatbots easier than ever. In this tutorial, we'll explore how to use <code>st.chat_input</code> and <code>st.chat_message</code> to create a powerful, custom chatbot, augmented by your own data using LlamaIndex.</p>
+
+    <h2>Why Use Streamlit's Chat Elements?</h2>
+    <p>The chat components <code>st.chat_input</code> and <code>st.chat_message</code> are powerful tools for creating chatbot interfaces with minimal code. Here’s why they stand out:</p>
+    <ul>
+        <li><strong>Simplicity:</strong> Create a fully functional chat interface in just a few lines of code.</li>
+        <li><strong>Interactivity:</strong> Capture user input and display responses seamlessly in a conversational format.</li>
+        <li><strong>Customization:</strong> Easily style and structure your chat UI to fit your needs.</li>
+        <li><strong>Integration:</strong> Work effortlessly with other Streamlit components and external libraries.</li>
+    </ul>
+
+    <h2>3. Build the App</h2>
+    <p>Now, let's build a chatbot that answers questions based on custom data, using Streamlit’s chat elements and LlamaIndex for data augmentation. Follow the steps below:</p>
+
+    <h3>3.1. Import Libraries</h3>
+    <p>Start by importing the required libraries:</p>
+    <pre><code>import streamlit as st
+from llama_index import VectorStoreIndex, ServiceContext, Document
+from llama_index.llms import OpenAI
+import openai
+from llama_index import SimpleDirectoryReader
+</code></pre>
+    <p>This imports the necessary libraries for Streamlit, LlamaIndex, and OpenAI’s GPT API. These libraries allow you to build the chatbot and index the custom data.</p>
+
+    <h3>3.2. Initialize Message History</h3>
+    <p>Initialize your chatbot's message history:</p>
+    <pre><code>openai.api_key = st.secrets.openai_key
+st.header("Chat with the Streamlit docs 💬 📚")
+
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+        {"role": "assistant", "content": "Ask me a question about Streamlit's open-source Python library!"}
+    ]
+</code></pre>
+    <p>This snippet sets the OpenAI API key from the Streamlit app’s secrets. The message history is initialized to store the chatbot’s conversation, and the assistant greets the user with a starting message.</p>
+
+    <h3>3.3. Load and Index Data</h3>
+    <p>Load the custom knowledge base and index it for querying:</p>
+    <pre><code>@st.cache_resource(show_spinner=False)
+def load_data():
+    with st.spinner("Loading and indexing the Streamlit docs – hang tight! This should take 1-2 minutes."):
+        reader = SimpleDirectoryReader(input_dir="./data", recursive=True)
+        docs = reader.load_data()
+        service_context = ServiceContext.from_defaults(llm=OpenAI(model="gpt-3.5-turbo", temperature=0.5, system_prompt="You are an expert on the Streamlit Python library."))
+        index = VectorStoreIndex.from_documents(docs, service_context=service_context)
+        return index
+
+index = load_data()
+</code></pre>
+    <p>This code reads the markdown files from the `./data` folder, creates an index using LlamaIndex, and prepares the GPT-3.5 model with a system prompt to respond based on the Streamlit documentation.</p>
+
+    <h3>3.4. Create the Chat Engine</h3>
+    <p>Now, create the chat engine that will handle user queries:</p>
+    <pre><code>chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
+</code></pre>
+    <p>This defines a chat engine using the “condense_question” mode, ensuring that each user question queries the indexed knowledge base for an accurate response.</p>
+
+    <h3>3.5. Prompt for User Input and Display Message History</h3>
+    <p>Capture user input and display the message history:</p>
+    <pre><code>if prompt := st.chat_input("Your question about Streamlit"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
+</code></pre>
+    <p>This snippet displays a text input for the user to ask questions. The session state keeps track of all messages (user and assistant) and displays them in a chat-style format.</p>
+
+    <h3>3.6. Pass Query to Chat Engine and Display Response</h3>
+    <p>Finally, if the last message is from the user, the chatbot processes the query and generates a response:</p>
+    <pre><code>if st.session_state.messages[-1]["role"] != "assistant":
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            response = chat_engine.chat(prompt)
+            st.write(response.response)
+            message = {"role": "assistant", "content": response.response}
+            st.session_state.messages.append(message)
+</code></pre>
+    <p>Once the user asks a question, this block ensures that the chatbot processes the input and generates a response using the indexed knowledge base. A spinner is displayed while the chatbot thinks, and the response is shown in the chat history.</p>
+
+    <h2>Streamlit for Chatbot Development</h2>
+    <p>Streamlit offers numerous advantages for chatbot development:</p>
+    <ul>
+        <li><strong>Fast Prototyping:</strong> Build and iterate your chatbot quickly.</li>
+        <li><strong>Easy Deployment:</strong> Share your app with others effortlessly using Streamlit Community Cloud.</li>
+        <li><strong>Rich Visual Elements:</strong> Include charts, graphs, and other data visualizations alongside your chatbot UI.</li>
+        <li><strong>State Management:</strong> Streamlit’s session state simplifies managing conversation flow.</li>
+        <li><strong>Community Support:</strong> Tap into a strong community of developers and rich documentation.</li>
+    </ul>
+
+    <h2>Enhance Your Chatbot</h2>
+    <p>With the basic structure in place, you can easily enhance your chatbot by:</p>
+    <ul>
+        <li>Integrating with LLMs like GPT for sophisticated responses</li>
+        <li>Incorporating custom data using LlamaIndex or other data connectors</li>
+        <li>Adding user authentication for personalized experiences</li>
+        <li>Responding with multimedia elements such as images, videos, and charts</li>
+    </ul>
+
+    <h2>Conclusion</h2>
+    <p>Streamlit’s chat elements make chatbot development simple yet powerful. With just a few lines of code, you can create a conversational interface and focus on building the core functionality of your chatbot. Whether you're creating a customer support tool, a virtual assistant, or a knowledge-based bot, Streamlit empowers you to bring your ideas to life with ease.</p>
+
+</body>
+</html>
