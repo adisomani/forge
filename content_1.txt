@@ -139,13 +139,13 @@ def load_data():
     with st.spinner("Loading and indexing the Streamlit docs – hang tight! This should take 1-2 minutes."):
         reader = SimpleDirectoryReader(input_dir="./data", recursive=True)
         docs = reader.load_data()
-        service_context = ServiceContext.from_defaults(llm=OpenAI(model="gpt-3.5-turbo", temperature=0.5, system_prompt="You are an expert on the Streamlit Python library."))
+        service_context = ServiceContext.from_defaults(llm=OpenAI(model="gpt-4-turbo", temperature=0.5, system_prompt="You are an expert on the Streamlit Python library."))
         index = VectorStoreIndex.from_documents(docs, service_context=service_context)
         return index
 
 index = load_data()
 </code></pre>
-    <p>This code reads the markdown files from the `./data` folder, creates an index using LlamaIndex, and prepares the GPT-3.5 model with a system prompt to respond based on the Streamlit documentation.</p>
+    <p>This code reads the markdown files from the `./data` folder, creates an index using LlamaIndex, and prepares the GPT-4 model with a system prompt to respond based on the Streamlit documentation.</p>
 
     <h3>3.4. Create the Chat Engine</h3>
     <p>Now, create the chat engine that will handle user queries:</p>

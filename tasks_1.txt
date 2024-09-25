@@ -1,6 +1,7 @@
-5: Researching Streamlit's chat elements and LlamaIndex.
+1: Planning the subtasks.
+8: Researching Streamlit's chat elements and LlamaIndex.
 3: Outlining article structure, focusing on Streamlit, LlamaIndex, and their synergy.
-3: Creating a demo chatbot using Streamlit and LlamaIndex.
-3: Checking for correctness.
-2: Extracting key code components and explaining them.
+8: Creating a demo chatbot using Streamlit and LlamaIndex.
+8: Checking for correctness.
+4: Extracting key code components and explaining them.
 3: Finalizing the article.
